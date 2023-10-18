@@ -185,7 +185,9 @@ La sezione **Relationship** mostra l'elenco di altri siti in cui sono state osse
     'OR(1=1)#
     ')OR('1'='1
     '%09OR%091=1%09--%09 (%09 corrisponde al TAB, sostituisce gli spazi quando questi sono bloccati)
+    %bf%27 or 1=1 -- (* vedi link sotto)
     ```
+    **[* link](https://shiflett.org/blog/2006/addslashes-versus-mysql-real-escape-string)**
 
 # Directory traversal
 
@@ -242,3 +244,13 @@ Quando un redirect è forzato a iniziare con `/`, l'aggiunta del sito web al red
 // sono interpretate come alias per http:// or https://.
 
 `/redirect.php?url=//www.test.test` == GET / - Host: www.test.test
+
+# SSRF
+
+```
+127.1
+2130706433
+017700000001
+
+http://<dominio corretto e sotto whitelist>.<dominio ad-hoc che risponde 127.0.0.1 per ogni sotto dominio>
+```
