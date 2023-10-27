@@ -24,4 +24,30 @@ La Piramide identifica 6 indicatori di compromissione da parte degli attaccanti:
     - servizi malevoli
     - file e cartelle fuori dal normale
 
+- **Tools**: software utilizzati dall'attaccante come tools per la creazione di allegati malevoli per spear phishing, backdoors verso server C2, tools per trovare password...
+
+- **Tattiche, tecniche e procedure (Tactics, Techniques and Procedures: TTPs)**: step dell'attacco, da recon a compromissione finale/esfiltrazione di dati
+
 <!-- - **Tools**: -->
+
+## SANS Incident Response 6-Steps Pan
+- **Prepaation**: viene delineata la policy di sicurezza dell'organizzazione che identifica gli asset sensibili e una strategia di gestione degli incidenti basata sui possibili rischi
+- **Identification**: identificazione di possibili incidenti, raccolta di informazioni aggiuntive
+- **Containment**: contenimento della minaccia
+- **Eradication**: rimozione completa della minaccia
+- **Recovery**: ripristino delle macchine compromesse a uno stato normale o comunque il più vicino possibile
+- **Lessons learned**: analisi dell'intervento e pianificazione di azioni necessarie per prevenire che incidente si ripeta in futuro
+
+<img src="https://www.forescout.com/wp-content/uploads/2020/01/Forescout-NIST-Framework-The-5-Core-Functions.svg" width="100%" height="auto">
+
+## SOC
+
+3 tipi di SOC:
+
+- **Threat-centric**: ricerca attiva di minacce nella rete
+- **Compliance-based**: analizza e configura difesa per rendere l'azienda in linea con i regolamenti di interesse, come PCI DSS o CIS
+- **Operation-based**: SOC interno (ComputerSecurityIncidentResponseTeam), continuo assessment degli asset interni
+
+- **SOC interno**: on-site, interamente gestito dall'azienda proprietaria
+- **vSOC**: servizio a contratto con terze parti
+- **Ibrido**: combinazione dei due sopra
