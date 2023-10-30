@@ -30,24 +30,51 @@ La Piramide identifica 6 indicatori di compromissione da parte degli attaccanti:
 
 <!-- - **Tools**: -->
 
-## SANS Incident Response 6-Steps Pan
-- **Prepaation**: viene delineata la policy di sicurezza dell'organizzazione che identifica gli asset sensibili e una strategia di gestione degli incidenti basata sui possibili rischi
+## SANS Incident Response 6 Steps Plan
+- **Prepaeation**: viene delineata la policy di sicurezza dell'organizzazione che identifica gli asset sensibili e una strategia di gestione degli incidenti basata sui possibili rischi
 - **Identification**: identificazione di possibili incidenti, raccolta di informazioni aggiuntive
 - **Containment**: contenimento della minaccia
 - **Eradication**: rimozione completa della minaccia
 - **Recovery**: ripristino delle macchine compromesse a uno stato normale o comunque il più vicino possibile
 - **Lessons learned**: analisi dell'intervento e pianificazione di azioni necessarie per prevenire che incidente si ripeta in futuro
 
-<img src="https://www.forescout.com/wp-content/uploads/2020/01/Forescout-NIST-Framework-The-5-Core-Functions.svg" width="100%" height="auto">
 
 ## SOC
 
-3 tipi di SOC:
+**3 tipi di SOC:**
 
 - **Threat-centric**: ricerca attiva di minacce nella rete
 - **Compliance-based**: analizza e configura difesa per rendere l'azienda in linea con i regolamenti di interesse, come PCI DSS o CIS
 - **Operation-based**: SOC interno (ComputerSecurityIncidentResponseTeam), continuo assessment degli asset interni
-
+----
 - **SOC interno**: on-site, interamente gestito dall'azienda proprietaria
 - **vSOC**: servizio a contratto con terze parti
 - **Ibrido**: combinazione dei due sopra
+
+**Dati per analisi**:
+
+- **Session Data**: rappresenta un sunto della comunicazione tra due endpoint in cui è solo possibile vedere IP sorgente/destinazione, porta sorgente/destinazione e il protocollo di trasporto
+- **Full Packet Capture**: conversazione completa tra due endpoint, non solo dati relativi alla sessione ma anche contenuto della comunicazione (crittografia permettendo)
+- **Transaction Data**: artefatti prodotti dall'interazione tra endpoint spesso registrata in log o altri sistemi di raccolta dati
+- **Extracted Content**: artefatti estratti dall'analisi del traffico di rete, quindi allegati da SMTP, dati di sessione, nomi DNS...
+- **Statistical Data**: dati aggregati per il monitoraggio di eventi straordinari, che esulano dalla baseline
+- **Alert Data**: 
+
+**Ruoli SOC**:
+
+**Analista Tier 1**: monitoraggio continuo degli alert, triage degli alert, monitoraggio dello stato dei sensori e degli endpoint, raccoglie dati e informazioni per Tier 2
+
+-**Analista Tier 2**: esegue Incident Analysis in profondità correlando dati da più sorgenti, determina se sistemi critici o dati sensibili sono stati compromessi, istruisce per il ripristino della situazione, fornisce supporto per nuove metriche per Threat Detection
+
+**Incident responder**: gestisce l'incident, mette in atto strategie di contenimento e assicura che l'Incident Response sia seguito con attenzione
+
+- **Specialista di Forensics**: incentrato sul raccogliere e analizzare dati per scopo investigativo senza contaminare quanto raccolto
+
+- **Specialista Malware Reverse Engineering**: analizza nel dettaglio il comportamento dei malware per determinare TTPs e IOCs, produce signatures
+
+- **SOC Management**: gestisce risorse come personale, budget, turnazioni, tecnologie per rispettare SLA
+
+- **Executive**: direzione generale del SOC e assicura che gli obiettivi siano rispettati
+
+
+**Worflow Management System, Security Orchestration, Automation, Response**: automazione creazione ticket incidenti e automazione risposta agli incidenti
