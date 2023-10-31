@@ -238,30 +238,24 @@ void *ec_malloc(unsigned int size){
 
 **fcntl.h**
 
-- O_RDONLY : apre in sola lettura
-- O_WRONLY : apre in sola scrittura
-- O_RDWR : apre in lettura e scrittura
-<br>
-<br>
-- O_APPEND : scrive alla fine del file
-- O_TRUNC : se il file esiste, lo tronca a lunghezza 0
-- O_CREAT : crea il file se non esiste
+- O_RDONLY : apre in sola lettura  
+- O_WRONLY : apre in sola scrittura  
+- O_RDWR : apre in lettura e scrittura  
+- O_APPEND : scrive alla fine del file  
+- O_TRUNC : se il file esiste, lo tronca a lunghezza 0  
+- O_CREAT : crea il file se non esiste  
 
 **sys/stat.h**
 
-- S_IRUSR : lettura per utente (owner)
-- S_IWUSR : scrittura per utente (owner)
-- S_IXUSR : esecuzione per utente (owner)
-<br>
-<br>
-- S_IRGRP : lettura per gruppo
-- S_IWGRP : scrittura per gruppo
-- S_IXGRP : esecuzione per gruppo
-<br>
-<br>
-- S_IROTH : lettura per altri
-- S_IWOTH : scrittura per altri
-- S_IxOTH : esecuzione per altri
+- S_IRUSR : lettura per utente (owner)  
+- S_IWUSR : scrittura per utente (owner)  
+- S_IXUSR : esecuzione per utente (owner)  
+- S_IRGRP : lettura per gruppo  
+- S_IWGRP : scrittura per gruppo  
+- S_IXGRP : esecuzione per gruppo  
+- S_IROTH : lettura per altri  
+- S_IWOTH : scrittura per altri  
+- S_IxOTH : esecuzione per altri  
 
 **#include <risorsa.h>** : cerca il file nella cartella di default, /usr/include  
 **#include "risorsa.h"** : cerca il file nella cartella dove risiede il programma  
