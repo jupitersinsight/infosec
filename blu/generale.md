@@ -58,7 +58,7 @@ La Piramide identifica 6 indicatori di compromissione da parte degli attaccanti:
 - **Transaction Data**: artefatti prodotti dall'interazione tra endpoint spesso registrata in log o altri sistemi di raccolta dati
 - **Extracted Content**: artefatti estratti dall'analisi del traffico di rete, quindi allegati da SMTP, dati di sessione, nomi DNS...
 - **Statistical Data**: dati aggregati per il monitoraggio di eventi straordinari, che esulano dalla baseline
-- **Alert Data**: 
+- **Alert Data**: alert generati principalmente da sistemi IDS e IPS
 
 **Ruoli SOC**:
 
