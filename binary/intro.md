@@ -111,23 +111,54 @@ gs             0x33     51
 ````
 
 **break main** : inserisce breakpoint su `main()`, quindi il codice una volta avviato il programma col comando `run` si ferma al breakpoint, prima dell'esecuzione della funzione principale.  
+
 Sulla sinistra ci sono i registri del processore di cui i primi 4 (EAX, ECX, EDX, EBX) sono considerati per uso generico ma principalmente come variabili temporanee.  
-- **EAX** : Accumulator
-- **ECX** : Counter
-- **EDX** : Data
-- **EBX** : Base
+- **EAX**: Accumulator (di solito i risultati delle operazioni matematiche sono memorizzati in questo registro)
+- **ECX** : Counter (spesso usato per operazioni di loop...)
+- **EDX** : Data (spesso usato in operazioni di divisione e moltiplicazione)
+- **EBX**: Base (spesso usato per memorizzare il Base address che fa riferimento a un offset.)
 
 I registri ESP, EBP, ESI, EDI sono anche questi considerati come registri per uso generico ma sono definiti _pointers_ e _indexes_ perché:
-- **ESP** : Stack Pointer
-- **EBP** : Base Pointer
-- **ESI** : Source Index
-- **EDI** : Destination Index
+- **ESP** : Stack Pointer (punta all'inizio dello stack)
+- **EBP** : Base Pointer (usato per accedere ai parametri passati dallo stack)
+- **ESI** : Source Index (usato per operazioni sulle stringhe)
+- **EDI** : Destination Index (usato per operazioni sulle stringhe)
+
+**Registro per soli sistemi a 64bit** = **R8-R15** (scopo generico e si può accedere come R8D (double-word), R8W (word) e R8B (byte))
 
 I primi due registri sono chiamati _pointers_ perché immagazzinano informazioni sulle posizioni 32-bit, puntanto quindi a specifiche aree di memoria. Gli altri due registri sono comunemente usati per puntare a sorgente e destinazione di dati quando c'è necessità di lettura o scrittura.  
 
-Il registro EIP (**Instruction Pointer**) punta all'istruzione in quel momento in lettura da parte del processore. 
+Il registro EIP (**Instruction Pointer**) punta all'indirizzo dell'istruzione successiva
 
-Il registro EFLAGS contiene diversi flag che sono usati per comparazione e segmentazione della memoria.
+---
+|64bit|32bit|16bit|8bit superiori|8bit inferiori|
+|-|-|-|-|-|
+|RAX|EAX|AX|AH|AL|
+|RBX|EBX|BX|BH|BL|
+|RCX|ECX|CX|CH|CL|
+|RDX|EDX|DX|DH|DL|
+|RSP|ESP|/|/|/|
+|RBP|EBP|/|/|/|
+|RSI|ESI|/|/|/|
+|RDI|EDI|/|/|/|
+|R8|/|/|/|/|
+---
+
+Il registro **EFLAGS** (32bit) o **RFLAGS** (64bit) contiene diversi flag che sono usati per comparazione e segmentazione della memoria indicano lo stato dell'esecuzione.
+
+Alcuni flag sono:
+- ZF (Zero Flag): indica quando il risultato dell'ultima istruzione eseguita è stato 0 (bit a 1)
+- CF (Carry Flag): indica quando il risultato dell'ultima istruzione eseguita è stato un numero troppo grande o troppo piccolo per la destinazione (bit a 1)
+- SF (Sign Flag): indica se il risultato di un operazione è negativo o il più significativo (the most significant bit) è impostato a 1 (bit a 1)
+- TF (Trap Flag): indica se il processore è in modalità debug, eseguendo una istruzione per volta
+
+---
+I Segment Registers sono registri di 16bit che convertono lo spazio della memoria in segmenti per facilitarne l'accesso e indirizzamento:
+- **Code Segment (CS)**: registro che punta alla sezione **Code** in memoria
+- **Data Segment (DS)**: registro alla sezione dei dati del programma in memoria
+- **Stack Segment (SS)**: registro che punta allo stack del programma in memoria
+- **Extra Segment (ES, FS, GS)**: registri che puntano a differenti sezioni di dati. Questi segmenti e il DS dividono la memoria del programma in quattro sezioni di dati distinte.
+---
 
 Per cambiare la sintassi in GDB `set disassemlby intel` o `set dis intel` (persistente: `echo "set dis intel" > ./.gdbinit`).  
 

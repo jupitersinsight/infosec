@@ -107,7 +107,7 @@ I segmenti _data_ e _bss_ contengono rispettivamente le variabili global e stati
 Il segmento _heap_ è un segmento di memoria direttamente controllabile dal programmatore. Questo segmento, a differenza di text, non ha una dimensione fissa. L'heap cresce verso il basso, verso indirizzi più alti.  
 
 Il segmento _stack_ ha una dimensione variabile il cui scopo è di memorizzare variabili locali (GDB backtrace analizza questo segmento). Il segmento stack contiene diversi _stack frame_, ognuno dei quali contiene informazioni per il ritorno dell'EIP , tutte le variabili locali e ricorda tutte le variabili passate.  
-Le informazioni nello stack seguono l'ordinamento _First In Last Out (FILO)_. Push  = inserisci, Pop = rimuovi.  
+Le informazioni nello stack seguono l'ordinamento _Last In First Out (LIFO)_. Push  = inserisci, Pop = rimuovi.  
 Il registro ESP tiene traccia dell'ultimo indirizzo nello stack.  
 A differenza dell'heap, lo stack cresce verso l'alto verso gli indirizzi più bassi. 
 EBP (frame pointer (FP) o local base (LB) pointer) = usato per fare riferimento a variabili locali nello stack frame.
