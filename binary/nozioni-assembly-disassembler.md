@@ -20,7 +20,7 @@ int main()
 
 ```
 
-```assembly
+```
 ----------objdump -D firstprog | grep -A20 main.:
 08048374 <main>:
  8048374:       55                      push   %ebp
@@ -52,7 +52,7 @@ Il linguaggio **assembly**, quindi le istruzioni sulla destra, non è altro che 
 
 L'estratto di output poco sopra usa la sinstassi AT&T mentre quello che segue usa la sintassi Intel.  
 
-```assembly
+```
 ----------objdump -M intel -D firstprog | grep -A20 main.:
 08048374 <main>:
  8048374:       55                      push   ebp
@@ -82,7 +82,7 @@ Ogni famiglia/gruppo di processori ha il suo set di **registri**, ovvero set di 
 I programmi chiamati **debugger** servono lo scopo di analizzare i vari step di funzionamento di un programma compilato, di esaminare la memoria di un programma e di visualizzare i registri del processore.  
 GCC include un debugger chiamato GDB.  
 
-```assembly
+```
 ----------gdb -q ./firstprog 
 Using host libthread_db library "/lib/tls/i686/cmov/libthread_db.so.1".
 (gdb) break main
@@ -147,10 +147,10 @@ Il registro EIP (**Instruction Pointer**) punta all'indirizzo dell'istruzione su
 Il registro **EFLAGS** (32bit) o **RFLAGS** (64bit) contiene diversi flag che sono usati per comparazione e segmentazione della memoria indicano lo stato dell'esecuzione.
 
 Alcuni flag sono:
-- ZF (Zero Flag): indica quando il risultato dell'ultima istruzione eseguita è stato 0 (bit a 1)
-- CF (Carry Flag): indica quando il risultato dell'ultima istruzione eseguita è stato un numero troppo grande o troppo piccolo per la destinazione (bit a 1)
-- SF (Sign Flag): indica se il risultato di un operazione è negativo o il più significativo (the most significant bit) è impostato a 1 (bit a 1)
-- TF (Trap Flag): indica se il processore è in modalità debug, eseguendo una istruzione per volta
+- **ZF** (Zero Flag): indica quando il risultato dell'ultima istruzione eseguita è stato 0 (bit a 1)
+- **CF** (Carry Flag): indica quando il risultato dell'ultima istruzione eseguita è stato un numero troppo grande o troppo piccolo per la destinazione (bit a 1)
+- **SF** (Sign Flag): indica se il risultato di un operazione è negativo o il più significativo (the most significant bit) è impostato a 1 (bit a 1)
+- **TF** (Trap Flag): indica se il processore è in modalità debug, eseguendo una istruzione per volta
 
 ---
 I Segment Registers sono registri di 16bit che convertono lo spazio della memoria in segmenti per facilitarne l'accesso e indirizzamento:
@@ -162,32 +162,85 @@ I Segment Registers sono registri di 16bit che convertono lo spazio della memori
 
 Per cambiare la sintassi in GDB `set disassemlby intel` o `set dis intel` (persistente: `echo "set dis intel" > ./.gdbinit`).  
 
-L'istruzione assembly secondo la sinstassi Intel è `operazione <destinazione>, <sorgente>. 
+L'istruzione assembly secondo la sinstassi Intel è `operazione \<destinazione>, \<sorgente>. 
 
 Es. 1  
-```assembly
+```
 8048375:       89 e5                   mov    ebp,esp
 8048377:       83 ec 08                sub    esp,0x8
 ```
 Sposta (mov) il valore da ESP a EBP. Sottrae (sub) 8 da ESP.
 
 Es. 2
-```assembly
+```
 804838b:       83 7d fc 09             cmp    DWORD PTR [ebp-4],0x9
 804838f:       7e 02                   jle    8048393 <main+0x1f>
 8048391:       eb 13                   jmp    80483a6 <main+0x32>
 ```
 Compara due valori (cmp), ovvero 9 e EBP-4. Se la comparazione "salta se minore di o uguale a" (jle) ritorna un valore vero l'esecuzione salta all'indirizzo 0x8048393. Altrimenti si effettua il salto (jmp) all'indirizzo 0x80483a6.  
+
+`Indirizzo: opcode operand [assembly]` =>  `040000:    b8 5f 00 00 00    mov eax, 0x5f`
+L'opcode identifica il valore hex del'operazione (es. **b8** corrisponde a **mov eax**) mentre operand identifica i registri o gli indirizzi di memoria su cui l'operazione è eseguita (es. **eax** e **5f 00 00 00**).
+
+Tipi di operandi (operands):
+- **Immediate Operands**: valori fissi (es. 0x5f)
+- **Registers**: che possono anche essere operandi (es. eax)
+- **Memory operands**: indicati con l'uso di parentesi quadre [ ] (es. [eax]) significa che l'operand è l'indirizzo di memoria a cui fa riferimento il valore.
+
+Istruzioni:
+- **mov**: copia il **valore** dalla sorgente alla destinazione
+- **lea**: copia l'indirizzo di memoria dalla sorgente alla destinazione
+- **nop**: copia eax in eax ovvero una operazione che non comporta modifiche e quindi consuma cicli di CPU in attesa di un altro evento
+- **shr** e **shl**: spostano i bit a destra o sinistra del numero di **count** indicato. Es. `shl 00000001 0x1 = 00000010` || `
+`. Nel caso in cui ripetessimo l'ultima operazione, il bit in eccesso finirebbe nel flag CF. 
+- **ror** e **rol**: ruotano i bit a destra o sinistra seguendo la sintassi dell'istruzione shift. La differenza però è chei bit non sono scartati ma spostati all'altro capo del registro, es. `shr 10101010 0x1 = 01010101`.
+
+Le operazioni di shift sono utili per risparmiare istruzioni nel caso di divisioni e moltiplicazioni, es 2/2=1 e 1*2=2.  
+
+Operazioni aritmetiche:
+- **add**: addizione segue la sintassi \<destinazione> \<sorgente>
+- **sub**: sottrazione segue la sintassi come sopra
+- **mul**: moltiplicazione invece moltiplica il valore nel registro **eax**: `mul <value>`. Il prodotto della moltiplicazione occupa due registri, `eax:edx`, con i 32bit più bassi in **eax**
+- **div**: segue la sintassi di mul e salva il quoziente in **eax** e il resto in **edx**
+- **inc**: incrementa il valore del registro specificato
+- **dec**: diminuisce il valore del registro specificato
+
+Operatori logici:
+- **AND**: operazione bitwise AND ritorna 1 solo quando entrambi gli input sono 1, altrimenti ritorna 0
+- **OR** operazione bitwise OR ritorna 1 quando almeno uno dei due input è 1
+- **NOT**: operazione che inverte i bit dell'operando: converte gli 1 in 0 e viceversa
+- **XOR**: operazione bitwise XOR ritorna 1 solo quando gli input sono opposti, altrimenti ritorna 0 (`xor eax eax` resetta un registro a 0)
+
+Operatori condizionali:
+- **TEST**: esegue operazione AND tra sorgente e destinazione ma non memorizza il risultato nella destinazione bensì imposta il flag ZF se il risultato dell'operazione è 0. Utile per verificare, testando contro se stesso, se un operatore ha valore NULL.
+- **CMP**: compara sorgente e destinazione e imposta flag ZF se il risultato è 0 oppure CF se la sorgente è maggiore della destinazione. Se la destinazione è maggiore, ZF e CF sono svuotati. 
+- **JMP**: comprende un set di diverse istruzioni che istruiscono il processore a saltare, condizionatamente ai flag nel registro dei flag, all'indirizzo di memoria specificato per eseguire un nuovo set di istruzioni (in linguaggi di alto livello `if...else`)
+
+|Instruzione|Spiegazione|
+|-|-|
+|jz|salta se flag ZF=1|
+|jnz|salta se flag ZF=0|
+|je|salta se uguale, spesso usato dopo una istruzione CMP|
+|jne|salta se non uguale, spesso usato dopo istruzione CMP|
+|jg|salta se la destinazione è maggiore della sorgente
+|jl|salta se la destinazione è minore della sorgente
+|jge|salta se la destinazione è uguale o maggiore della sorgente
+|jle|salta se la destinazione è minore o uguale della sorgente
+|ja|salta se sopra, simile a jg ma è comparazione unsigned invece che comparazione signed
+|jb|salta se sotto, simile a jl ma esegue comparazione unsigned invece che comparazione signed
+|jae|salta se sopra o uguale a 
+|jbe|salta se sotto o uguale a
+
 Quando si compila un programma, il compiler aggiunge istruzioni definite _function prologue_, per creare spazio necessario per l'esecuzione del codice compilato.  
 
-```assembly
+```
 (gdb) disassemble main
 Dump of assembler code for function main:
 ```
 
 **[inizio function prologue]**
 
-```assembly
+```
 0x08048374 <main+0>:    push   ebp
 0x08048375 <main+1>:    mov    ebp,esp
 0x08048377 <main+3>:    sub    esp,0x8
@@ -198,7 +251,7 @@ Dump of assembler code for function main:
 
 **[fine function prologue]**
 
-```assembly
+```
 0x08048384 <main+16>:   mov    DWORD PTR [ebp-4],0x0 ### i=0 (variabile i occupa 4 byte), è assegnato il valore 0 a ebp-4
 0x0804838b <main+23>:   cmp    DWORD PTR [ebp-4],0x9 ### comparazione tra valore 9 e ebp-4
 0x0804838f <main+27>:   jle    0x8048393 <main+31> ### se il valore dell'operazione precedente (memorizzato nel registro EFLAGS) è minore o uguale a 9 in questo caso, salta all'indirizzo 8048393
@@ -223,7 +276,7 @@ Codifiche:
 - **t** : binario
 
 Anteponendo un valore numerico alla codifica è possibile esaminare più unità per indirizzo di memoria.
-```assembly
+```
 (gdb) x/12o 0x8048384
 0x8048384 <main+16>:    077042707       020300000000    017602376175    030704765402
 0x8048394 <main+32>:    020441022004    0172004004      021577777777    077776105
@@ -244,7 +297,7 @@ Memorizzazione ordine byte (in base all'hardware):
 **big-endian** : memorizzazione/trasmissione inizia dal byte più significativo (estremità più grande)
 Il debugger riconosce come il valore deve essere memorizzato e interpretato, mostra il byte nell'ordine corretto quando è nella sua giusta dimensione (esempio 4 byte).  
 Quando invece è impostata una dimensione diversa nella visualizzazione, ad esempio 2 byte, i valori sono invertiti affinché il valore decimale risulti corretto.
-```assembly
+```
 0x8048384 <main+16>:    0x45c7  0x00fc  0x0000  0x8300
 (gdb) x/4xw $eip
 0x8048384 <main+16>:    0x00fc45c7      0x83000000      0x7e09fc7d      0xc713eb02
@@ -254,7 +307,7 @@ Quando invece è impostata una dimensione diversa nella visualizzazione, ad esem
 Assegnazione valore a variabile `$1 = [valore]`.  
 Il comando examine, x, supporta l'argomento **i**, _instructios_, che mostra in output la memoria disassemblata come linguaggio assembly.  
 Es:
-```assembly
+```
 (gdb) x/10i $eip
 0x8048384 <main+16>:    mov    DWORD PTR [ebp-4],0x0
 0x804838b <main+23>:    cmp    DWORD PTR [ebp-4],0x9
@@ -270,7 +323,7 @@ Es:
 0x80483ac <main+56>:    ret 
 ```
 
-```assembly
+```
 (gdb) x/2xw 0x8048484
 0x8048484:      0x6c6c6548      0x57202c6f
 (gdb) x/6xb 0x8048484
@@ -293,12 +346,12 @@ Valore hex da tabella ASCII:
 - **0x21** : !
 - **0x0a** : LF (\n)
 
-```assembly
+```
 (gdb) x/14cb 0x8048484
 0x8048484:      72 'H'  101 'e' 108 'l' 108 'l' 111 'o' 44 ','  32 ' '  87 'W'
 0x804848c:      111 'o' 114 'r' 108 'l' 100 'd' 33 '!'  10 '\n'
 ```
-```assembly
+```
 (gdb) x/s 0x8048484
 0x8048484:       "Hello, World!\n"
 ```
