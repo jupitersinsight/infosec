@@ -100,11 +100,11 @@ Sono inizializzate una volta sola.
 
 
 Segmentazione della memoria = la memoria di un programma compilato è diviso in 5 segmenti: text, data, bss, heap e stack.  
-Il _text segment_, o _code segment_ include le istruzioni in linguaggio assembly ed è di sola lettura, ha una dimensione fissa (non sono previste modifiche al codice). . La sola lettura permette l'esecuzione di più istanze e impedisce che il codice sia modificato e impedisce tentativi di manomissione del codice (qualsiasi tentativo comporta la chiusura del programma).  
+Il _text segment_, o _code segment_ include le istruzioni ed è di sola lettura, ha una dimensione fissa (non sono previste modifiche al codice). . La sola lettura permette l'esecuzione di più istanze e impedisce che il codice sia modificato e impedisce tentativi di manomissione del codice (qualsiasi tentativo comporta la chiusura del programma).  
 
 I segmenti _data_ e _bss_ contengono rispettivamente le variabili global e static inizializzate e quelle non inizializzate.  
 
-Il segmento _heap_ è un segmento di memoria direttamente controllabile dal programmatore. Questo segmento, a differenza di text, non ha una dimensione fissa. L'heap cresce verso il basso, verso indirizzi più alti.  
+Il segmento _heap_ è un segmento di memoria direttamente controllabile dal programmatore. Allocazione di memoria alla creazione di variabili, liberazione di memoria all'eliminazione di variabili. Questo segmento, a differenza di text, non ha una dimensione fissa. L'heap cresce verso il basso, verso indirizzi più alti.  
 
 Il segmento _stack_ ha una dimensione variabile il cui scopo è di memorizzare variabili locali (GDB backtrace analizza questo segmento). Il segmento stack contiene diversi _stack frame_, ognuno dei quali contiene informazioni per il ritorno dell'EIP , tutte le variabili locali e ricorda tutte le variabili passate.  
 Le informazioni nello stack seguono l'ordinamento _Last In First Out (LIFO)_. Push  = inserisci, Pop = rimuovi.  

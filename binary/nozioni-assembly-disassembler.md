@@ -180,14 +180,14 @@ Es. 2
 Compara due valori (cmp), ovvero 9 e EBP-4. Se la comparazione "salta se minore di o uguale a" (jle) ritorna un valore vero l'esecuzione salta all'indirizzo 0x8048393. Altrimenti si effettua il salto (jmp) all'indirizzo 0x80483a6.  
 
 `Indirizzo: opcode operand [assembly]` =>  `040000:    b8 5f 00 00 00    mov eax, 0x5f`
-L'opcode identifica il valore hex del'operazione (es. **b8** corrisponde a **mov eax**) mentre operand identifica i registri o gli indirizzi di memoria su cui l'operazione è eseguita (es. **eax** e **5f 00 00 00**).
+L'opcode identifica il valore hex dell'operazione (es. **b8** corrisponde a **mov eax**) mentre operand identifica i registri o gli indirizzi di memoria su cui l'operazione è eseguita (es. **eax** e **5f 00 00 00**).
 
 Tipi di operandi (operands):
 - **Immediate Operands**: valori fissi (es. 0x5f)
 - **Registers**: che possono anche essere operandi (es. eax)
-- **Memory operands**: indicati con l'uso di parentesi quadre [ ] (es. [eax]) significa che l'operand è l'indirizzo di memoria a cui fa riferimento il valore.
+- **Memory address operands**: indicati con l'uso di parentesi quadre [ ] (es. [eax]) significa che l'operand è l'indirizzo di memoria a cui fa riferimento il valore.
 
-Istruzioni:
+Istruzioni o *mnemonics*:
 - **mov**: copia il **valore** dalla sorgente alla destinazione
 - **lea**: copia l'indirizzo di memoria dalla sorgente alla destinazione
 - **nop**: copia eax in eax ovvero una operazione che non comporta modifiche e quindi consuma cicli di CPU in attesa di un altro evento
@@ -295,6 +295,10 @@ In alcuni casi il termine **word** identifica anche unità di 2 byte, mentre un 
 Memorizzazione ordine byte (in base all'hardware):
 **little-endian** : memorizzazione/trasmissione inizia dal byte meno significativo (estremità più piccola)
 **big-endian** : memorizzazione/trasmissione inizia dal byte più significativo (estremità più grande)
+
+**Network = BIG ENDIAN**  
+**Sistema locale = LITTLE ENDIAN**
+
 Il debugger riconosce come il valore deve essere memorizzato e interpretato, mostra il byte nell'ordine corretto quando è nella sua giusta dimensione (esempio 4 byte).  
 Quando invece è impostata una dimensione diversa nella visualizzazione, ad esempio 2 byte, i valori sono invertiti affinché il valore decimale risulti corretto.
 ```
