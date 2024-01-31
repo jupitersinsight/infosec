@@ -119,7 +119,7 @@ Sulla sinistra ci sono i registri del processore di cui i primi 4 (EAX, ECX, EDX
 - **EBX**: Base (spesso usato per memorizzare il Base address che fa riferimento a un offset.)
 
 I registri ESP, EBP, ESI, EDI sono anche questi considerati come registri per uso generico ma sono definiti _pointers_ e _indexes_ perché:
-- **ESP** : Stack Pointer (punta all'inizio dello stack)
+- **ESP** : Stack Pointer (punta al tetto dello stack)
 - **EBP** : Base Pointer (usato per accedere ai parametri passati dallo stack)
 - **ESI** : Source Index (usato per operazioni sulle stringhe)
 - **EDI** : Destination Index (usato per operazioni sulle stringhe)
@@ -149,7 +149,7 @@ Il registro **EFLAGS** (32bit) o **RFLAGS** (64bit) contiene diversi flag che so
 Alcuni flag sono:
 - **ZF** (Zero Flag): indica quando il risultato dell'ultima istruzione eseguita è stato 0 (bit a 1)
 - **CF** (Carry Flag): indica quando il risultato dell'ultima istruzione eseguita è stato un numero troppo grande o troppo piccolo per la destinazione (bit a 1)
-- **SF** (Sign Flag): indica se il risultato di un operazione è negativo o il più significativo (the most significant bit) è impostato a 1 (bit a 1)
+- **SF** (Sign Flag): indica se il risultato di un'operazione è negativo o il bit più significativo (the most significant bit) è impostato (bit a 1)
 - **TF** (Trap Flag): indica se il processore è in modalità debug, eseguendo una istruzione per volta
 
 ---
@@ -189,18 +189,18 @@ Tipi di operandi (operands):
 
 Istruzioni o *mnemonics*:
 - **mov**: copia il **valore** dalla sorgente alla destinazione
-- **lea**: copia l'indirizzo di memoria dalla sorgente alla destinazione
+- **lea**: copia l'**indirizzo** di memoria dalla sorgente alla destinazione
 - **nop**: copia eax in eax ovvero una operazione che non comporta modifiche e quindi consuma cicli di CPU in attesa di un altro evento
 - **shr** e **shl**: spostano i bit a destra o sinistra del numero di **count** indicato. Es. `shl 00000001 0x1 = 00000010` || `
 `. Nel caso in cui ripetessimo l'ultima operazione, il bit in eccesso finirebbe nel flag CF. 
 - **ror** e **rol**: ruotano i bit a destra o sinistra seguendo la sintassi dell'istruzione shift. La differenza però è chei bit non sono scartati ma spostati all'altro capo del registro, es. `shr 10101010 0x1 = 01010101`.
 
-Le operazioni di shift sono utili per risparmiare istruzioni nel caso di divisioni e moltiplicazioni, es 2/2=1 e 1*2=2.  
+Le operazioni di shift sono utili per risparmiare istruzioni nel caso di moltiplicazioni, in quanto spostare di *n* bit a sinistra corrisponde a moltiplicare per 2^*n numero di bit spostati*. 
 
 Operazioni aritmetiche:
 - **add**: addizione segue la sintassi \<destinazione> \<sorgente>
-- **sub**: sottrazione segue la sintassi come sopra
-- **mul**: moltiplicazione invece moltiplica il valore nel registro **eax**: `mul <value>`. Il prodotto della moltiplicazione occupa due registri, `eax:edx`, con i 32bit più bassi in **eax**
+- **sub**: sottrazione segue la sintassi come sopra ma imposta ZF se la differenza è 0 o CF se la destinazione è minore del sottraendo
+- **mul**: moltiplicazione invece moltiplica il valore nel registro **eax**: `mul <value>`. Il prodotto della moltiplicazione occupa due registri (64bit), `eax:edx`, con i 32bit più bassi in **eax**
 - **div**: segue la sintassi di mul e salva il quoziente in **eax** e il resto in **edx**
 - **inc**: incrementa il valore del registro specificato
 - **dec**: diminuisce il valore del registro specificato
@@ -209,7 +209,7 @@ Operatori logici:
 - **AND**: operazione bitwise AND ritorna 1 solo quando entrambi gli input sono 1, altrimenti ritorna 0
 - **OR** operazione bitwise OR ritorna 1 quando almeno uno dei due input è 1
 - **NOT**: operazione che inverte i bit dell'operando: converte gli 1 in 0 e viceversa
-- **XOR**: operazione bitwise XOR ritorna 1 solo quando gli input sono opposti, altrimenti ritorna 0 (`xor eax eax` resetta un registro a 0)
+- **XOR**: operazione bitwise XOR ritorna 1 solo quando gli input sono opposti, altrimenti ritorna 0 (`xor eax, eax` resetta un registro a 0)
 
 Operatori condizionali:
 - **TEST**: esegue operazione AND tra sorgente e destinazione ma non memorizza il risultato nella destinazione bensì imposta il flag ZF se il risultato dell'operazione è 0. Utile per verificare, testando contro se stesso, se un operatore ha valore NULL.
