@@ -1,4 +1,4 @@
-## Architettura di Windows
+# Architettura di Windows
 
 L'architettura di Windows si basa su due componenti principali:
 - **User Mode**: componente che gestisce i processi per conto degli utenti del sistema. Supporta operazioni con pochi privilegi e quando necessario può richiedere, tramite chiamate API ad-hoc, l'elevazione temporanea dei privilegi e accedere alla Kernel Mode per completare l'operazione in corso.
@@ -10,11 +10,97 @@ Processi creati in User Mode hanno ognuno un proprio indirizzo virtuale che è l
 
 Per contro, i processi creati in Kernel Mode condividono lo stesso indirizzo virtuale, quindi se un processo crasha l'intero sistema operativo crasha.
 
+`SYSENTER`, `SYSCALL` o `INT 0x2E` sono indicatori che un programma sta richiedendo accesso alla kernel-mode (accesso che avviene solo atraverso l'uso di Windows API).
+
 Il processo **Session Manager** (Smss.exe) si occupa di avviare User e Kernel Mode all'avvio del sistema (`HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\SubSystems`).  
 
 Processo => Singolo Thread (unità più piccola riconosciuta dal SO a cui è possibile associare "tempo processore") => Da primo Thread >> Molteplici Thread che condividono spazio virtuale e contesto del processo.
 
 Un'applicazione non può accedere direttamete a un file (oggetto) ma lo fa attraverso un handle.
+
+
+ ## Windows API
+ Il sistema di nomeclatura delle API di Windows è chiamato *Hungarian Notation* e consiste nel apporre un prefisso ai nomi delle funzioni/variabili che ne indichi chiaramente la natura.  
+ Ad esempio, se la funzione VirtualAllocEx accetta come suo parametro *n* **dwSize** si sa che si tratta di una variabile tipo DWORD.
+
+ |Prefisso e tipo|Descrizione|
+ |-|-|
+ |WORD (w)|Valore a 16bit unsigned|
+ |DWORD (dw)|Valore a 32bit unsigned|
+ |Handles (H)|Riferimento a un oggetto, esempi: HMOdule, HInstance, HKey|
+ |Long Pointer (LP)|Un pointer a un altro tipo, esempi: LPByte (byte), LPCSTR (carattere)|
+ |Callback|Rappresentano una funzione che sarà chiamata dalla API di Windows|
+
+ Oltre le Windows API, esiste un set di API non pienamente documentate da Microsoft che prendono il nome di [**Native API**](https://learn.microsoft.com/en-us/sysinternals/resources/inside-native-applications).  
+ Queste API funzionano a livello di kernel e permettono un accesso totale al sistema e fanno quindi gola agli sviluppatori di malware.
+ La DLL *ntdll.dll* è una DLL speciale che gestisce l'interazione tra spazio User e Kernel (le cui funzioni sono in *ntoskrnl.exe*).
+
+
+ ### Handles
+ 
+ Gli Handle sono oggetti aperti o creati dal sistema operativo come finestre, processi, moduli, menu, file e così via.  
+ Gli Handle sono simili ai Pointers, in quanto fanno riferiento ad oggetti o indirizzi di memoria, ma non possono, ad esempio, essere usati in operazioni aritmetiche.  
+
+ ### Funzioni/API d'interesse per il FileSystem
+
+ |Nome|Descrizione|
+ |-|-|
+ |CreateFile|Crea o apre file|
+ |ReadFile e WriteFile|Scrive su file o legge *n* byte del file per volta|
+ |CreateFileMapping e MapViewOfFile|Il primo è utile per gli hacker in quanto carica in memoria un dato file, mentre il secondo restituisce un pointer all'indirizzo di memoria dell'oggetto specificato|
+ |
+
+### Funzioni/API d'interesse per il Networking
+***Prima di poter usare qualsiasi funzione legata al networking è necessario chiamare la funzione *WSAStartup* per allocare le risorse necessarie (durante analisi statica o dinamica è utile impostare un breakpoint per poi analizzare le operazioni di rete).***
+
+*da ws2_32.dll* / *Winsock API*
+|Nome|Descrizione|
+|-|-|
+|socket|Crea un socket|
+|bind|Attacca un socket a una specifica porta|
+|listen|Il socket rimane in ascolto per connessioni in ingresso|
+|accept|Apre una connessione a un socket remoto e accetta la connessione|
+|connect| apre una connessione a un socket remoto; il socket remoto deve essere in ascolto e in attesa della connessione|
+|recv|Riceve dati da un socket remoto|
+|send|Invia dati a un socket remoto|
+
+Altra DLL importante è *Wininet.dll** e la relativa API *WinINet API* per operazioni a un livello più alto (HTTP,FTP...).
+
+## Threads e Mutexes
+
+I processi non sono altro che *contenitori* per i thread che sono ciò che la CPU effettivamente esegue. Ogni thread è infatti una sequenza di istruzioni ben definita col proprio stack e registri, anche se condivide lo spazio di memoria con altri thread. 
+Ogni thread mantiene il controllo esclusivo sulla CPU o sul core assegnato. Per permettere l'esecuzione "contemporanea" di più thread, la CPU salva in un *thread context* tutti i valori usati da un dato thread.  
+A questo punto la CPU carica il +thread context* relativo a un altro thread per continuarne l'esecuzione. 
+
+I **Mutexes** altro non sono che oggetti globali e sono spesso usati per il controllo dell'accesso a risorse condivise. Un Mutex può essere "bloccato" e usato da un solo thread per volta. Essendo i Mutexes spesso *hard-coded* sono spesso ottimi candidati per la generazione di signatures host-based.
+
+Un thread usa la funzione `WaitForSingleObject` per prenotare l'accesso a un Mutex e la funzione `ReleaseMutex` per rilasciarlo.
+
+## Servizi
+
+Windows offre, come negli altri casi, funzioni dedicate per la gestione dei servizi attraverso le sue API come `OpenSCManager`, `CreateService` e `StartService`.  
+In Windows esistono diversi *tipi* di servizi: con processo condiviso `SERVICE_WIN32_SHARE_PROCESS`, ovvero il codice del servizio è racchiuso in una DLL e il processo di esecuzione è condiviso con altri servizi, con processo di proprietà `SERVICE_WIN32_OWN_PROCESS`, ovvero il codice è racchiuso in un file eseguibile ed eseguito in un processo indipendente.  
+Altro tipo di servizio da tenere in considerazione è `SERVICE_KERNEL_DRIVER`, ovvero il servizio è un driver.
+
+## COM (Component Object Model)
+
+Interfaccia standard di Windows che permette a componenti software di richiamare codice di altri componenti software senza conoscerne le specifiche tecniche. Il framework funziona in client/server dove i client sono i componenti software mentre il server gli oggetti COM.
+
+Gli oggetti COM sono richiamati dai programmi usando il loro GUID chiamato CLSID (class identifier) e IID (interface identifier).  
+Esempio di funzionamento: un malware usa la funzione `Navigate` (che permette l'apertura del browser di sistema e la navigazione a un sito web, in questo esempio IE) parte dell'interfaccia `IWebBrowser2` implementata da Internet Explorer.
+
+## File speciali
+
+**File condivisi**  
+Accessibli tramite `\\nomeServer\risorsa` o `\\?\nomeServer\risorsa`, dove `\\?\` indica che Windows non deve eseguire il parsing della stringa e attivare il supporto per l'accesso a file con nome lungo.  
+
+### File accessibili tramite Namespaces
+
+Esempio `\\.\PhysicalDisk1` permette di accedere direttamente al disco fisico 1 indipendente dal filesyestem in uso e di leggerne o modificarne i dati.  
+
+### ADS o Alternate Data Stream
+
+Funzionalità che permette di memorizzare in un file un secondo stream di dati che rimane nascosto fino a quando invocato o individuato e manualmente esposto.
 
 ## Filesystem NTFS
 
@@ -36,14 +122,18 @@ Windows considera gli script di Powershell come provenienti da fonti esterne qua
 
 **Unrestricted**: non ci sono restrizioni all'esecuzione di script di Powershell.
 
-## Windows Registry
+## Registro di Sistema di Windows
 
 - **HKEY_CURRENT_USER (HKCU)**: contiene informazioni associate all'utente loggato.
+    - `HKCU\SOFTWARE\Classes\CLSID`: elenco di oggetti COM
 
 - **HKEY_USERS (HKU)**: contiene informazioni su tutti gli account utente del sistema.
 
 - **HKEY_CLASSES_ROOT (HKCR)**: contiene informazioni su associazioni di file e registrazioni OLE, Object Linking and Embedding.
 
 - **HKEY_LOCAL_MACHINE (HKLM)**: contiene informazioni di sistema.
+    - `HKLM\SYSTEM\CurrentControlSet\Services`: elenco di servizi
+    - `HKLM\SOFTWARE\Classes\CLSID`: elenco di oggetti COM
 
 - **HKEY_CURRENT_CONFIG (HKCC)**: contiene informazioni sul profilo hardware in uso.
+
