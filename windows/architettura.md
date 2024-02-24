@@ -18,37 +18,51 @@ Processo => Singolo Thread (unità più piccola riconosciuta dal SO a cui è pos
 
 Un'applicazione non può accedere direttamete a un file (oggetto) ma lo fa attraverso un handle.
 
+## Kernel Driver Object
 
- ## Windows API
- Il sistema di nomeclatura delle API di Windows è chiamato *Hungarian Notation* e consiste nel apporre un prefisso ai nomi delle funzioni/variabili che ne indichi chiaramente la natura.  
- Ad esempio, se la funzione VirtualAllocEx accetta come suo parametro *n* **dwSize** si sa che si tratta di una variabile tipo DWORD.
+I *device drivers*, generalmente riferiti come *drivers*, sono pezzi di codice che permettono l'esecuzione di codice nel kernel di Windows.  
+L'individuazione e l'analisi dei driver malevoli non è semplice in quanto si caricano in memoria e nessun dispositivo/applicazione interagisce direttamente con i driver. L'interazione avviene tramite *device objects*, ovvero middleman che gestiscono le richieste delle applicazioni verso i driver di riferimento.  
 
- |Prefisso e tipo|Descrizione|
- |-|-|
- |WORD (w)|Valore a 16bit unsigned|
- |DWORD (dw)|Valore a 32bit unsigned|
- |Handles (H)|Riferimento a un oggetto, esempi: HMOdule, HInstance, HKey|
- |Long Pointer (LP)|Un pointer a un altro tipo, esempi: LPByte (byte), LPCSTR (carattere)|
- |Callback|Rappresentano una funzione che sarà chiamata dalla API di Windows|
+Un esempio: quando si inserisce una chiavetta USB nel computer, Windows si occupa di creare un *device object X:drive*. Le applicazioni che necessitano di eseguire operazioni sulla chiavetta USB interagiscono con questo *device object*. Allo stesso modo, nel momento in cui si inserisce una seconda chiavetta USB, lo stesso driver potrebbe essere coinvolto ma viene creato un secondo oggetto *Y:drive*.
 
- Oltre le Windows API, esiste un set di API non pienamente documentate da Microsoft che prendono il nome di [**Native API**](https://learn.microsoft.com/en-us/sysinternals/resources/inside-native-applications).  
- Queste API funzionano a livello di kernel e permettono un accesso totale al sistema e fanno quindi gola agli sviluppatori di malware.
- La DLL *ntdll.dll* è una DLL speciale che gestisce l'interazione tra spazio User e Kernel (le cui funzioni sono in *ntoskrnl.exe*).
+Per consentire il corretto funzionamento di questo sistema, i driver devono essere caricati nel kernel così come le DLL sono caricate nei processi.
+
+Più in dettaglio, quando un driver è caricato, la sua registrazione nel sistema avviene nella routine *DriverEntry*. Windows crea una *driver object structure* che è passata alla routine *DriverEntry*. Questa routine si occupa di riempire la *driver object structure* con le sue callback functions.  
+La routine crea infine un *device* accessibile dallo user-space per l'interazione col driver.
+
+Il kernel di Windows supporta stringhe unicode con sintassi diverse dal sistema usato in user-space: `\ROOTObject\Drive:\File`.
+
+## Windows API
+
+Il sistema di nomeclatura delle API di Windows è chiamato *Hungarian Notation* e consiste nel apporre un prefisso ai nomi delle funzioni/variabili che ne indichi chiaramente la natura.  
+Ad esempio, se la funzione VirtualAllocEx accetta come suo parametro *n* **dwSize** si sa che si tratta di una variabile tipo DWORD.
+
+|Prefisso e tipo|Descrizione|
+|-|-|
+|WORD (w)|Valore a 16bit unsigned|
+|DWORD (dw)|Valore a 32bit unsigned|
+|Handles (H)|Riferimento a un oggetto, esempi: HMOdule, HInstance, HKey|
+|Long Pointer (LP)|Un pointer a un altro tipo, esempi: LPByte (byte), LPCSTR (carattere)|
+|Callback|Rappresentano una funzione che sarà chiamata dalla API di Windows|
+
+Oltre le Windows API, esiste un set di API non pienamente documentate da Microsoft che prendono il nome di [**Native API**](https://learn.microsoft.com/en-us/sysinternals/resources/inside-native-applications).  
+Queste API funzionano a livello di kernel e permettono un accesso totale al sistema e fanno quindi gola agli sviluppatori di malware.
+La DLL *ntdll.dll* è una DLL speciale che gestisce l'interazione tra spazio User e Kernel (le cui funzioni sono in *ntoskrnl.exe*).
 
 
- ### Handles
- 
- Gli Handle sono oggetti aperti o creati dal sistema operativo come finestre, processi, moduli, menu, file e così via.  
- Gli Handle sono simili ai Pointers, in quanto fanno riferiento ad oggetti o indirizzi di memoria, ma non possono, ad esempio, essere usati in operazioni aritmetiche.  
+### Handles
 
- ### Funzioni/API d'interesse per il FileSystem
+Gli Handle sono oggetti aperti o creati dal sistema operativo come finestre, processi, moduli, menu, file e così via.  
+Gli Handle sono simili ai Pointers, in quanto fanno riferiento ad oggetti o indirizzi di memoria, ma non possono, ad esempio, essere usati in operazioni aritmetiche.  
 
- |Nome|Descrizione|
- |-|-|
- |CreateFile|Crea o apre file|
- |ReadFile e WriteFile|Scrive su file o legge *n* byte del file per volta|
- |CreateFileMapping e MapViewOfFile|Il primo è utile per gli hacker in quanto carica in memoria un dato file, mentre il secondo restituisce un pointer all'indirizzo di memoria dell'oggetto specificato|
- |
+### Funzioni/API d'interesse per il FileSystem
+
+|Nome|Descrizione|
+|-|-|
+|CreateFile|Crea o apre file|
+|ReadFile e WriteFile|Scrive su file o legge *n* byte del file per volta|
+|CreateFileMapping e MapViewOfFile|Il primo è utile per gli hacker in quanto carica in memoria un dato file, mentre il secondo restituisce un pointer all'indirizzo di memoria dell'oggetto specificato|
+|
 
 ### Funzioni/API d'interesse per il Networking
 ***Prima di poter usare qualsiasi funzione legata al networking è necessario chiamare la funzione *WSAStartup* per allocare le risorse necessarie (durante analisi statica o dinamica è utile impostare un breakpoint per poi analizzare le operazioni di rete).***
