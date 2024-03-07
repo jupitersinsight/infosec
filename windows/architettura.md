@@ -1,14 +1,18 @@
 # Architettura di Windows
 
 L'architettura di Windows si basa su due componenti principali:
-- **User Mode**: componente che gestisce i processi per conto degli utenti del sistema. Supporta operazioni con pochi privilegi e quando necessario può richiedere, tramite chiamate API ad-hoc, l'elevazione temporanea dei privilegi e accedere alla Kernel Mode per completare l'operazione in corso.
-- **Kernel Mode**: componente che gestisce i processi fondamentali di Windows. Opera con i massimi privilegi per gestire CPU e memoria.
+- **User Mode** (Ring3): componente che gestisce i processi per conto degli utenti del sistema. Supporta operazioni con pochi privilegi e quando necessario può richiedere, tramite chiamate API ad-hoc, l'elevazione temporanea dei privilegi e accedere alla Kernel Mode per completare l'operazione in corso.
+- **Kernel Mode** (Ring0): componente che gestisce i processi fondamentali di Windows. Opera con i massimi privilegi per gestire CPU e memoria.  
+***ntdll.dll*** espone il kernel alla user-mode. È invocato da ***kernel32.dll***.  
+A sua volta ***ntdll.dll*** si interfaccia con ***ntoskrnl.exe*** ovvero il kernel Windows. Si tratta di un file PE che espone migliaia di funzioni per interagire con l'hardware. Queste funzioni sono dei costrutti che quando invocati preparano i dati prima di passarli a funzioni di più basso livello.  
+Ad esempio ***NtCreateFile*** esegue una serie di ***mov*** prima di passare il dato/valore a ***IopCreateFile***.
 
 <img src="https://learn.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/images/userandkernelmode01.png" width="100%" height="auto">
 
 Processi creati in User Mode hanno ognuno un proprio indirizzo virtuale che è limitato in dimensione e non accessibile da altre applicazioni. Se una specifica applicazione crasha, le altre applicazioni e il sistema operativo continuano a funzionare correttamente.
 
-Per contro, i processi creati in Kernel Mode condividono lo stesso indirizzo virtuale, quindi se un processo crasha l'intero sistema operativo crasha.
+Per contro, i processi creati in Kernel Mode condividono lo stesso indirizzo virtuale, quindi se un processo crasha l'intero sistema operativo crasha.  
+Inoltre, dal kernel sono accessibili le pagine di memoria dello user-space in quanto Windows non pone limiti di sicurezza sulle operazioni che originano dal kernel-space che hanno completo accesso al *system-space*.
 
 `SYSENTER`, `SYSCALL` o `INT 0x2E` sono indicatori che un programma sta richiedendo accesso alla kernel-mode (accesso che avviene solo atraverso l'uso di Windows API).
 
@@ -94,7 +98,8 @@ Un thread usa la funzione `WaitForSingleObject` per prenotare l'accesso a un Mut
 
 Windows offre, come negli altri casi, funzioni dedicate per la gestione dei servizi attraverso le sue API come `OpenSCManager`, `CreateService` e `StartService`.  
 In Windows esistono diversi *tipi* di servizi: con processo condiviso `SERVICE_WIN32_SHARE_PROCESS`, ovvero il codice del servizio è racchiuso in una DLL e il processo di esecuzione è condiviso con altri servizi, con processo di proprietà `SERVICE_WIN32_OWN_PROCESS`, ovvero il codice è racchiuso in un file eseguibile ed eseguito in un processo indipendente.  
-Altro tipo di servizio da tenere in considerazione è `SERVICE_KERNEL_DRIVER`, ovvero il servizio è un driver.
+Altro tipo di servizio da tenere in considerazione è `SERVICE_KERNEL_DRIVER`, ovvero il servizio è un driver.  
+`HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services` percorso del Registro di sistema dove sono memorizzate le informazioni passate a `CreateService` le quali sono salvate in una nuova chiave.
 
 ## COM (Component Object Model)
 
@@ -145,8 +150,13 @@ Windows considera gli script di Powershell come provenienti da fonti esterne qua
 
 - **HKEY_CLASSES_ROOT (HKCR)**: contiene informazioni su associazioni di file e registrazioni OLE, Object Linking and Embedding.
 
-- **HKEY_LOCAL_MACHINE (HKLM)**: contiene informazioni di sistema.
+- **HKEY_LOCAL_MACHINE (HKLM)**: contiene informazioni di sistema.  
+    Rilevanti ai fini della gestione dei Driver e Servizi
+    - `HKLM\SYSTEM\CurrentControlSet\Control`  
+    - `HKLM\SYSTEM\CurrentControlSet\Enum`  
+    - `HKLM\SYSTEM\CurrentControlSet\HardwareProfiles`  
     - `HKLM\SYSTEM\CurrentControlSet\Services`: elenco di servizi
+
     - `HKLM\SOFTWARE\Classes\CLSID`: elenco di oggetti COM
 
 - **HKEY_CURRENT_CONFIG (HKCC)**: contiene informazioni sul profilo hardware in uso.
