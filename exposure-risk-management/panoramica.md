@@ -84,7 +84,7 @@ Cambiamenti di priorità delle vulnerbilità ma mitigare possono provenire da di
 ### Quality over quantity
 
 **Il modo migliore per rafforzare la security posture è un atteggiamento di mitigazione qualitativo e NON quantitativo.**  
-**Mitigare/rimediare le vulnerabilità che presentano la maggiore probabilità di essere sfruttate con successo e con un alto impatto sul business e sugli asset critici comporta benefici MAGGIORI di corsa alla mitigazione di TUTTE le vulnerabilità.**  
+**Mitigare/rimediare le vulnerabilità che presentano la maggiore probabilità di essere sfruttate con successo e con un alto impatto sul business e sugli asset critici comporta benefici MAGGIORI di una corsa alla mitigazione di TUTTE le vulnerabilità.**  
 
 
 ### Fattori che incidono sulla prioritizzazione
