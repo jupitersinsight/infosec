@@ -37,3 +37,5 @@ Entrando nel dettaglio e analizzando il numero di sessioni e dimensioni totale d
 Nel secondo caso tutte le sessioni avranno la stessa dimensione ovvero a ogni domanda corrisponde sempre la stessa risposta (negativa).  
 Nel primo caso, invece, compariranno altre sessioni con dimensione più o meno variabile che potrebbero indicare la presenza di eventuali istruzioni e l'invio della risposta degli agent. A questo punto si passa ad una analisi approfondita dell'host e del malware.  
 
+### ICMP C2
+ICMP C2 = discrepanze nella dimensione tra richiesta e risposta (dovrebbero essere identiche o almeno simili), frequenza, sequence number e identifier "craftati", payload assente o profondamento diverso dai noti dei SO.
