@@ -165,6 +165,10 @@ Identifica l'ultimo byte dei dati urgenti, bypassa la normale coda FIFO.
 
 Le TCP Options sono generalmente passate in pacchetti con flag SYN o SYN/ACK.  
 
+Le Options sono negoziate da chi inizia la conversazione. L'altra parte non può proporre l'utilizzo di Options non specificate dal client ma solo confermare di supportarle o meno, tutte o in parte.  
+
+**I tool di packet crafting generalmente creano pacchetti con TCP Options vuote, quindi identificabili.**
+
 Essendo in formato 32-bit (4 byte) devono essere divisibili per 4 quindi se il totale delle opzioni utilizzate è 18 byte, si aggiungeranno 2 byte di padding.  
 
 Struttura delle Options: KIND e LENGTH (tipo e dimensione dell'opzione).
@@ -225,3 +229,15 @@ Inizialmente una comunicazione TCP si bloccava fino a che la parte mancante non 
 **Timestamp**  
 
 Non identifica il momento temporale d'invio del pacchetto ma se il Sequence number ritorna a 0, dopo che il suo valore ha raggiunto il tetto massimo, il valore del campo Timestamp, che è inizializzato in maniera randomica, aiuta a riordinare correttamente i pacchetti.
+
+# Tip per scansione
+
+FIN scan (segmento con solo flag FIN impostata) utile per scansione delle porte di un sistema Linux in quanto applica quanto definito dalla RFC.  
+
+Secondo la RFC, infatti, quando un sistema riceve un pacchetto con solo FIN flag impostata su una porta aperta **non** deve esserci risposta in quanto si tratta di un pacchetto malformato (FIN/ACK è l'unica combinazione ammessa).  
+
+Mentre quando riceve il pacchetto su una porta chiusa il sistema operativo prende in carico la risposta e restituisce un **RST/ACK**.
+
+In questo modo è possibile individuare quali porte sono chiuse e quali sono aperte.
+
+Di contro Windows risponde sempre con un RST/ACK e questo rende impossibile, usando questa tecnica, enumerare le porte aperte.

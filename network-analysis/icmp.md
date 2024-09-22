@@ -47,3 +47,7 @@ Messaggio di **HOST UNREACHABLE** è utile per inviare un falso messagio a event
 
 Esempio di sintassi di IPTABLES:  
 `iptables <...> -j REJECT --reject-with icmp-host-unreachable`
+
+I messaggi **ICMP UNREACHABLE** contengono nel payload parte dell'header del messaggio originale e in alcuni casi messaggi per il mittente.  
+
+Ad esempio, nel caso di invio di pacchetti con il FLAG DF (Don't Fragment) attivo, nel momento in cui capiti che uno dei router che si trovano lungo il percorso del pacchetto supporti solo una MTU inferiore, ritorna un messaggio ICMP UNREACHABLE che contiene un messaggio nel payload con la dimensione MTU da utilizzare.
