@@ -1,0 +1,2 @@
+## ICMP C2
+ICMP C2 = discrepanze nella dimensione tra richiesta e risposta (dovrebbero essere identiche o almeno simili), frequenza, sequence number e identifier "craftati", payload assente o profondamente diverso dai noti dei SO.

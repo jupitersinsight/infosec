@@ -22,4 +22,23 @@ Le comunicazioni delle backdoor che sfruttano il sistema dei DNS potrebbero non 
 Questo significa che il protocollo è usato da molti apparati, DNS infatti è essenziale, oppure che non c'è regolarità nelle comunicazioni.  
 Analizzare invece il *numero di eventi*x*sottodomini contattati* può far saltare all'occhio quali domini risultano nella maggior parte delle richieste (troncando al secondo/terzo sottodominio o comunque la porzione fissa e non variabile).
 
+## C2 over DNS
+----------------------------
+L'agente invia una richiesta DNS per un nome di dominio formato, ad esempio, così: *1s1d6fef1aef5sdf98e.evil.com*.  
+
+La richiesta di risoluzione DNS arriva al local resolver che non avendo informazioni a riguardo si rivolge al server più in alto nella catena che a sua volta potrebbe reindirizzare la richiesta fino a che si arriva al server DNS autoritativo per il TLD *.com*.  
+
+Questo server sa che evil.com è gestito da un (o più) server autoritativo(i): significa che l'attaccante quando ha comprato il dominio evil.com ha indicato come server autorevole il server C2.  
+
+La risposta del server viene quindi impacchettata e inviata all'host dove risiede l'agente. Questa risposta contiene la risposta alla query dell'agente: *dormi* o *esegui questo comando*.  
+
+In ogni caso la risposta anche un eventuale comando (quindi l'output) è codificato e inviato al server C2 seguendo la stessa prassi.  
+
+Questa tecnica genera un valore facilmente individuabile: **troppi FQDNs**.  
+
+Nella media la quantità di FDQNs (domini e sottodomini) appartenenti a una società è inferiore 10, nel caso di aziende come Microsoft, Akamai, Google, Amazon... il dato si attesta tra i 200 e i 600.  
+
+Un valore superiore a 1000 **deve** destare sospetti. 
+
+Esempio: sommando il numero di FQDNs univoci (non il numero di richieste e risposte) di evil.com ci si accorge del traffico C2 perché il totale supera il 1000.  
 
